@@ -1,0 +1,206 @@
+* {
+    box-sizing: border-box;
+  }
+  
+  ul {
+    margin-top: 0;
+    padding: 0;
+    width: 100%;
+  }
+
+  body{
+    margin-top: 0;
+  }
+  
+  ul li {
+    cursor: default;
+    position: relative;
+    padding: 12px 8px 12px;
+    margin-right: 0px;
+
+    background: #eee;
+    font-size: 18px;
+    display: block;
+    width: 100%;
+  }
+  
+  .checked {
+    background: rgb(194, 184, 184);
+    color: #fff;
+    text-decoration: line-through;
+  }
+  
+  .header {
+    background-color: #eee;
+    padding: 30px 40px;
+    color: black;
+    text-align: center;
+    height: 200px;
+  }
+
+  .menu {
+    width: 100%;
+  }
+
+  .header:after {
+    content: "";
+    display: table;
+    clear: both;
+  }
+  
+  input {
+    margin: 0;
+    border: black;
+    border-radius: 0;
+    width: 75%;
+    padding: 10px;
+    float: left;
+    font-size: 16px;
+  }
+  
+  .addBtn {
+    padding: 10px;
+    width: 25%;
+    background: rgb(175, 255, 175);
+    color: black;
+    float: left;
+    text-align: center;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 0;
+  }
+  
+  .addBtn:hover {
+    background-color: rgb(140, 245, 140);
+  }
+
+  #clear {
+    font-size: 16px;
+    float: right;
+    margin-right: 38px;
+    width: 24%;
+    border: 1px black;
+    background-color: rgb(243, 145, 145);
+  }
+  
+  #clear:hover{
+    background: rgb(235, 130, 130)
+  }
+
+  .filter {
+    width: 10%;
+    cursor: pointer;
+    display: inline;
+  }
+
+.deleteBtn {
+  border: none;
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 12px 16px 12px 12px;
+  background-color: #eee;
+  height: 46px;
+}
+
+.deleteBtn:hover {
+  cursor: pointer;
+}
+
+.completedBtn {
+  position: absolute;
+  border: none;
+  margin-right: 45px;
+  right: 0;
+  top: 0;
+  padding: 12px 16px 12px 12px;
+  background-color: #eee;
+  height: 46px;
+}
+
+.completedBtn:hover {
+  cursor: pointer;
+}
+
+.editBtn {
+  margin-right: 10px;
+}
+
+.editBtn:hover {
+  cursor: pointer;
+}
+
+.footer {
+  background-color: #eee;
+  height: 38px;
+  
+}
+
+.selected {
+  background-color: gray;
+}
+
+.menu {
+
+  position: fixed;
+  width: 99%;
+  z-index: 1;
+ }
+
+ #toDos {
+   padding-top: 238px;
+   width: auto;
+   margin-right: 0px;
+ }
+
+ textarea {
+   background-color: #eee;
+   border: none;
+   resize: none;
+   white-space: nowrap;
+   width: 700px;
+ }
+
+ textarea:focus {
+   outline: none;
+   background-color: white;
+ }
+
+ .editing {
+   background: #20b2aa;
+ }
+
+ .editing:hover {
+   background: #148d88;
+ }
+
+ .disabled {
+   cursor: default;
+   background: lightgray;
+ }
+
+ .disabled:hover{
+   background: lightgray;
+ }
+
+ .saveBtn {
+   background: #20b2aa;
+   cursor: pointer;
+   width: 60px;
+
+ }
+
+ .saveBtn:hover {
+   background: #1b7a75;
+ }
+
+ .cancelBtn {
+   background-color: rgb(243, 145, 145);
+   cursor: pointer;
+   width: 70px;
+ }
+
+ .cancelBtn:hover {
+   background: rgb(235, 130, 130)
+ }
+
