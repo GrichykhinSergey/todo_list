@@ -31,7 +31,7 @@ const deleteHandler = () => {
     deleteBtn.forEach((el) => el.onclick = () => fetch('/delete_item/', {
         method: 'POST',
         headers: {'X-CSRFToken': csrftoken},
-        body: JSON.stringify({'id': el.parentElement.id.slice(2), 'to_delete': true})
+        body: JSON.stringify({'id': el.parentElement.id.slice(2)})
     }).then((response) => response.text())
         .then((item_id) => ids.splice(+item_id, 1))
         .then(() => el.parentElement.remove()))
@@ -61,7 +61,7 @@ saveBtn.onclick = () => {
             fetch('/edit_item/', {
                 method: 'PATCH',
                 headers: {'X-CSRFToken': csrftoken},
-                body: JSON.stringify({'id': liEl.id.slice(2), 'content': input.value, 'item_to_update': true})
+                body: JSON.stringify({'id': liEl.id.slice(2), 'content': input.value})
             })
                 .then((response) => response.json())
                 .then((result) =>  liEl.lastChild.textContent = result.data)  //target.lastChild = result.data)
@@ -97,7 +97,7 @@ const completedTasksHandler = () => {
         fetch('/completed_item/', {
             method: 'PATCH',
             headers: {'X-CSRFToken': csrftoken},
-            body: JSON.stringify({'id': el.parentElement.id.slice(2), 'completed': el.parentElement.classList.contains('checked'), 'to_change_state': true})
+            body: JSON.stringify({'id': el.parentElement.id.slice(2), 'completed': el.parentElement.classList.contains('checked')})
         })
             .then((response) => response.json())
             .then((result) => console.log(result['result']))
@@ -172,7 +172,7 @@ add.onclick = () => {
         fetch('/add/', {
             method: 'POST',
             headers: {'X-CSRFToken': csrftoken},
-            body: JSON.stringify({'content': input.value, 'to_add': true})
+            body: JSON.stringify({'content': input.value})
         })
             .then((response) => response.json())
             .then((result) => createElement(result))
@@ -186,7 +186,7 @@ document.addEventListener('keydown', (event) => {
                 fetch('/add/', {
                     method: 'POST',
                     headers: {'X-CSRFToken': csrftoken},
-                    body: JSON.stringify({'content': input.value, 'to_add': true})})
+                    body: JSON.stringify({'content': input.value})})
                     .then((response) => response.json())
                     .then((result) => createElement(result))
                     }
@@ -220,7 +220,6 @@ clear.onclick = () => {
     fetch('/clear_completed_tasks/', {
             method: 'POST',
             headers: {'X-CSRFToken': csrftoken},
-            body: JSON.stringify({'to_delete_all': true})
     })
         .then(() => document.querySelectorAll('.deleteBtn')
             .forEach((el) => {
