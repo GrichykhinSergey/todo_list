@@ -29,12 +29,11 @@ const csrftoken = getCookie('csrftoken');
 const deleteHandler = () => {
   const deleteBtn = document.querySelectorAll('.deleteBtn');
   deleteBtn.forEach((el) => el.onclick = () => fetch('/delete_item/', {
-    method: 'POST',
+    method: 'DELETE',
     headers: {'X-CSRFToken': csrftoken},
     body: JSON.stringify({'id': el.parentElement.id.slice(2)})
   })
-      .then((response) => response.text())
-      .then((item_id) => ids.splice(+item_id, 1))
+      .then((item_id) => ids.splice(+el.parentElement.id.slice(2), 1))
       .then(() => el.parentElement.remove()))
 }
 
@@ -224,7 +223,7 @@ completed.onclick = () => {
 
 clear.onclick = () => {
   fetch('/clear_completed_tasks/', {
-    method: 'POST',
+    method: 'DELETE',
     headers: {'X-CSRFToken': csrftoken},
     body: JSON.stringify({'to_delete_all': true})
   })
