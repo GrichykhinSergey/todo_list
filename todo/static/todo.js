@@ -9,100 +9,101 @@ const cancelBtn = document.querySelector('#cancel');
 let ids = [];
 
 const getCookie = (name) => {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            // Does this cookie string begin with the name we want?
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
+  let cookieValue = null;
+  if (document.cookie && document.cookie !== '') {
+    const cookies = document.cookie.split(';');
+      for (let i = 0; i < cookies.length; i++) {
+        const cookie = cookies[i].trim();
+        // Does this cookie string begin with the name we want?
+        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+          cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+          break;
         }
     }
-    return cookieValue;
+  }
+  return cookieValue;
 }
 
 const csrftoken = getCookie('csrftoken');
 
 const deleteHandler = () => {
-    const deleteBtn = document.querySelectorAll('.deleteBtn');
-    deleteBtn.forEach((el) => el.onclick = () => fetch('/delete_item/', {
-        method: 'POST',
-        headers: {'X-CSRFToken': csrftoken},
-        body: JSON.stringify({'id': el.parentElement.id.slice(2)})
-    }).then((response) => response.text())
-        .then((item_id) => ids.splice(+item_id, 1))
-        .then(() => el.parentElement.remove()))
+  const deleteBtn = document.querySelectorAll('.deleteBtn');
+  deleteBtn.forEach((el) => el.onclick = () => fetch('/delete_item/', {
+    method: 'POST',
+    headers: {'X-CSRFToken': csrftoken},
+    body: JSON.stringify({'id': el.parentElement.id.slice(2)})
+  })
+      .then((response) => response.text())
+      .then((item_id) => ids.splice(+item_id, 1))
+      .then(() => el.parentElement.remove()))
 }
 
 const editHandler = () => {
-    const editBtn = document.querySelectorAll('.editBtn');
-    editBtn.forEach((el) => {
-        el.onclick = () => {
-            const editingEl = document.querySelector('.editing');
-            if (editingEl) editingEl.classList.remove('editing');
-
-            input.value = el.parentElement.lastChild.textContent;
-            input.setAttribute('class', el.parentElement.id);
-            addBtn.setAttribute('disabled', 'disabled');
-            addBtn.classList.add('disabled');
-            el.parentElement.classList.add('editing');
-            saveBtn.removeAttribute('hidden');
-            cancelBtn.removeAttribute('hidden');
-        }})
+  const editBtn = document.querySelectorAll('.editBtn');
+  editBtn.forEach((el) => {
+    el.onclick = () => {
+      const editingEl = document.querySelector('.editing');
+        if (editingEl) editingEl.classList.remove('editing');
+          input.value = el.parentElement.lastChild.textContent;
+          input.setAttribute('class', el.parentElement.id);
+          addBtn.setAttribute('disabled', 'disabled');
+          addBtn.classList.add('disabled');
+          el.parentElement.classList.add('editing');
+          saveBtn.removeAttribute('hidden');
+          cancelBtn.removeAttribute('hidden');
+    }
+  })
 }
 
 const patchRequest = () => {
-    const liEl = document.querySelector(`#${input.className}`);
-    console.log(input.className);
-    if (checkStringLength()) {
-        fetch('/edit_item/', {
-            method: 'PATCH',
-            headers: {'X-CSRFToken': csrftoken},
-            body: JSON.stringify({'id': liEl.id.slice(2), 'content': input.value})
-        })
-            .then((response) => response.json())
-            .then((result) =>  liEl.lastChild.textContent = result.data)
-            .then(() => liEl.classList.remove('editing'))
-            .then(() => input.value = '')
-            .then(() => addBtn.removeAttribute('disabled'))
-            .then(() => addBtn.classList.remove('disabled'))
-            .then(() => saveBtn.setAttribute('hidden', ''))
-            .then(() => cancelBtn.setAttribute('hidden', ''))
-        }
+  const liEl = document.querySelector(`#${input.className}`);
+  console.log(input.className);
+  if (checkStringLength()) {
+    fetch('/edit_item/', {
+      method: 'PATCH',
+      headers: {'X-CSRFToken': csrftoken},
+      body: JSON.stringify({'id': liEl.id.slice(2), 'content': input.value})
+    })
+        .then((response) => response.json())
+        .then((result) =>  liEl.lastChild.textContent = result.data)
+        .then(() => liEl.classList.remove('editing'))
+        .then(() => input.value = '')
+        .then(() => addBtn.removeAttribute('disabled'))
+        .then(() => addBtn.classList.remove('disabled'))
+        .then(() => saveBtn.setAttribute('hidden', ''))
+        .then(() => cancelBtn.setAttribute('hidden', ''))
+  }
 }
 
 saveBtn.onclick = patchRequest;
 
 cancelBtn.onclick = () => {
-    const liEl = document.querySelector(`#${input.className}`);
-    input.value = '';
-    addBtn.removeAttribute('disabled');
-    addBtn.classList.remove('disabled');
-    saveBtn.setAttribute('hidden', '');
-    cancelBtn.setAttribute('hidden', '');
-    liEl.classList.remove('editing');
+  const liEl = document.querySelector(`#${input.className}`);
+  input.value = '';
+  addBtn.removeAttribute('disabled');
+  addBtn.classList.remove('disabled');
+  saveBtn.setAttribute('hidden', '');
+  cancelBtn.setAttribute('hidden', '');
+  liEl.classList.remove('editing');
 }
 
 const completedTasksHandler = () => {
-    const editBtn = document.querySelectorAll('.completedBtn');
-    editBtn.forEach((el) => el.onclick = () => {
-        el.parentElement.classList.toggle('checked');
+  const editBtn = document.querySelectorAll('.completedBtn');
+  editBtn.forEach((el) => el.onclick = () => {
+    el.parentElement.classList.toggle('checked');
+      if (completed.classList.contains('selected')) {
+        filterElements(true);
+      } else if (inProgress.classList.contains('selected')) {
+        filterElements(false);
+      }
 
-        if (completed.classList.contains('selected')) {
-            filterElements(true);
-        } else if (inProgress.classList.contains('selected')) {
-            filterElements(false);
-        }
-        fetch('/completed_item/', {
-            method: 'PATCH',
-            headers: {'X-CSRFToken': csrftoken},
-            body: JSON.stringify({'id': el.parentElement.id.slice(2), 'completed': el.parentElement.classList.contains('checked')})
-        })
-            .then((response) => response.json())
-            .then((result) => console.log(result['result']))
+      fetch('/completed_item/', {
+        method: 'PATCH',
+        headers: {'X-CSRFToken': csrftoken},
+        body: JSON.stringify({'id': el.parentElement.id.slice(2), 'completed': el.parentElement.classList.contains('checked')})
+      })
+          .then((response) => response.json())
+          .then((result) => console.log(result['result']))
   })
 }
 
@@ -119,30 +120,30 @@ const checkStringLength = () => {
 
 const createElement = (content) => {
   if (!ids.includes(content.id) && content.data.trim().length > 0) {
-      const li = document.createElement('li');
-      li.setAttribute('id', `id${content.id}`);
-      li.setAttribute('tabindex', '0');
-      const text = document.createTextNode(content.data);
-      li.insertAdjacentHTML('beforeend', `<button class="deleteBtn" contenteditable="false">❌</button>
+    const li = document.createElement('li');
+    li.setAttribute('id', `id${content.id}`);
+    li.setAttribute('tabindex', '0');
+    const text = document.createTextNode(content.data);
+    li.insertAdjacentHTML('beforeend', `<button class="deleteBtn" contenteditable="false">❌</button>
       <button class="completedBtn" id="taskCompleted" contenteditable="false" >✅</button>
       <button class="editBtn" contenteditable="false">Edit</button>`);
-      li.append(text);
+    li.append(text);
+    if (content.completed) {
+      li.className = 'checked';
+    }
 
-      if (content.completed) {
-          li.className = 'checked';
-      }
+    if (completed.classList.contains('selected')) {
+      li.style.display = 'none';
+    } else {
+      li.style.display = 'block';
+    }
 
-      if (completed.classList.contains('selected')) {
-          li.style.display = 'none';
-      } else {
-          li.style.display = 'block';
-      }
-
-      ids.push(content.id);
-      ul.append(li);
-      input.value = '';
-      console.log(ids);
+    ids.push(content.id);
+    ul.append(li);
+    input.value = '';
+    console.log(ids);
   }
+
   deleteHandler();
   completedTasksHandler();
   editHandler();
@@ -166,41 +167,38 @@ const filterElements = (isCompleted) => {
 }
 
 fetch('/all_items/')
-    .then((response) => response.json())
-    .then((result) => result.forEach(item => createElement(item)))
+  .then((response) => response.json())
+  .then((result) => result.forEach(item => createElement(item)))
 
 add.onclick = () => {
-    if (checkStringLength()) {
-        fetch('/add/', {
-            method: 'POST',
-            headers: {'X-CSRFToken': csrftoken},
-            body: JSON.stringify({'content': input.value})
-        })
-            .then((response) => response.json())
-            .then((result) => createElement(result))
-
-    }
+  if (checkStringLength()) {
+    fetch('/add/', {
+      method: 'POST',
+      headers: {'X-CSRFToken': csrftoken},
+      body: JSON.stringify({'content': input.value})
+    })
+      .then((response) => response.json())
+      .then((result) => createElement(result))
+  }
 }
 
 document.addEventListener('keydown', (event) => {
-        if (event.code === 'Enter') {
-            if (checkStringLength()) {
-                if (document.querySelector('.editing')) {
-                    patchRequest();
-                } else {
-                    console.log(document.querySelector('.editing'));
-                    fetch('/add/', {
-                        method: 'POST',
-                        headers: {'X-CSRFToken': csrftoken},
-                        body: JSON.stringify({'content': input.value})
-                    })
-                        .then((response) => response.json())
-                        .then((result) => createElement(result))
-                }
-            }
-        }
+  if (event.code === 'Enter') {
+    if (checkStringLength()) {
+      if (document.querySelector('.editing')) {
+        patchRequest();
+      } else {
+        fetch('/add/', {
+        method: 'POST',
+        headers: {'X-CSRFToken': csrftoken},
+        body: JSON.stringify({'content': input.value})
+        })
+          .then((response) => response.json())
+          .then((result) => createElement(result))
+      }
     }
-)
+  }
+})
 
 all.onclick = () => {
   updateElements();
@@ -225,15 +223,15 @@ completed.onclick = () => {
 }
 
 clear.onclick = () => {
-    fetch('/clear_completed_tasks/', {
-            method: 'POST',
-            headers: {'X-CSRFToken': csrftoken},
+  fetch('/clear_completed_tasks/', {
+    method: 'POST',
+    headers: {'X-CSRFToken': csrftoken},
+  })
+    .then(() => document.querySelectorAll('.deleteBtn')
+    .forEach((el) => {
+      if (el.parentElement.classList.contains('checked')) {
+        el.parentElement.remove()
+      }
     })
-        .then(() => document.querySelectorAll('.deleteBtn')
-            .forEach((el) => {
-                if (el.parentElement.classList.contains('checked')) {
-                    el.parentElement.remove()
-                }
-            }
-            ))
+    )
 }
