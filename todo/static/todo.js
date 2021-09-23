@@ -226,6 +226,7 @@ clear.onclick = () => {
   fetch('/clear_completed_tasks/', {
     method: 'POST',
     headers: {'X-CSRFToken': csrftoken},
+    body: JSON.stringify({'to_delete_all': true})
   })
     .then(() => document.querySelectorAll('.deleteBtn')
     .forEach((el) => {
