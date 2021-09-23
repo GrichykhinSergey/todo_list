@@ -16,7 +16,7 @@ class AllItemsView(View):
         data = json.loads(request.body)
 
         if request.path == '/edit_item/':
-            item_to_update = Task.objects.get(id=int(data['id']))
+            item_to_update = Task.objects.get(id=data['id'])
             item_to_update.data = data['content']
             item_to_update.save()
             updated_item = list(Task.objects.filter(id=data['id']).values())
