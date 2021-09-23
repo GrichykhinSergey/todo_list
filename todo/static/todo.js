@@ -54,25 +54,27 @@ const editHandler = () => {
         }})
 }
 
-saveBtn.onclick = () => {
-        const liEl = document.querySelector(`#${input.className}`);
-        console.log(input.className);
-        if (checkStringLength()) {
-            fetch('/edit_item/', {
-                method: 'PATCH',
-                headers: {'X-CSRFToken': csrftoken},
-                body: JSON.stringify({'id': liEl.id.slice(2), 'content': input.value})
-            })
-                .then((response) => response.json())
-                .then((result) =>  liEl.lastChild.textContent = result.data)  //target.lastChild = result.data)
-                .then(() => liEl.classList.remove('editing'))
-                .then(() => input.value = '')
-                .then(() => addBtn.removeAttribute('disabled'))
-                .then(() => addBtn.classList.remove('disabled'))
-                .then(() => saveBtn.setAttribute('hidden', ''))
-                .then(() => cancelBtn.setAttribute('hidden', ''))
+const patchRequest = () => {
+    const liEl = document.querySelector(`#${input.className}`);
+    console.log(input.className);
+    if (checkStringLength()) {
+        fetch('/edit_item/', {
+            method: 'PATCH',
+            headers: {'X-CSRFToken': csrftoken},
+            body: JSON.stringify({'id': liEl.id.slice(2), 'content': input.value})
+        })
+            .then((response) => response.json())
+            .then((result) =>  liEl.lastChild.textContent = result.data)
+            .then(() => liEl.classList.remove('editing'))
+            .then(() => input.value = '')
+            .then(() => addBtn.removeAttribute('disabled'))
+            .then(() => addBtn.classList.remove('disabled'))
+            .then(() => saveBtn.setAttribute('hidden', ''))
+            .then(() => cancelBtn.setAttribute('hidden', ''))
         }
-    }
+}
+
+saveBtn.onclick = patchRequest;
 
 cancelBtn.onclick = () => {
     const liEl = document.querySelector(`#${input.className}`);
@@ -183,13 +185,19 @@ add.onclick = () => {
 document.addEventListener('keydown', (event) => {
         if (event.code === 'Enter') {
             if (checkStringLength()) {
-                fetch('/add/', {
-                    method: 'POST',
-                    headers: {'X-CSRFToken': csrftoken},
-                    body: JSON.stringify({'content': input.value})})
-                    .then((response) => response.json())
-                    .then((result) => createElement(result))
-                    }
+                if (document.querySelector('.editing')) {
+                    patchRequest();
+                } else {
+                    console.log(document.querySelector('.editing'));
+                    fetch('/add/', {
+                        method: 'POST',
+                        headers: {'X-CSRFToken': csrftoken},
+                        body: JSON.stringify({'content': input.value})
+                    })
+                        .then((response) => response.json())
+                        .then((result) => createElement(result))
+                }
+            }
         }
     }
 )
