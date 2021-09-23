@@ -12,6 +12,18 @@ class MainPageView(View):
 
 
 class AllItemsView(View):
+    def delete(self, request):
+        data = json.loads(request.body)
+
+        if request.path == '/delete_item/':
+            item_to_delete = Task.objects.get(id=data['id'])
+            item_to_delete.delete()
+            return JsonResponse({'result': 'success'})
+        elif request.path == '/clear_completed_tasks/':
+            completed_items = Task.objects.filter(completed=True)
+            completed_items.delete()
+            return JsonResponse({'result': 'success'})
+
     def patch(self, request):
         data = json.loads(request.body)
 
@@ -20,6 +32,7 @@ class AllItemsView(View):
             item_to_update.data = data['content']
             item_to_update.save()
             updated_item = list(Task.objects.filter(id=data['id']).values())
+            print(updated_item)
             return JsonResponse(updated_item[-1], safe=False)
         if request.path == '/completed_item/':
             item_to_change_state = Task.objects.get(id=data['id'])
@@ -35,14 +48,6 @@ class AllItemsView(View):
             new_item.save()
             item_data = list(Task.objects.order_by('id').filter(data=data['content']).values())
             return JsonResponse(item_data[-1], safe=False)
-        elif request.path == '/delete_item/':
-            item_to_delete = Task.objects.get(id=data['id'])
-            item_to_delete.delete()
-            return HttpResponse(data['id'])
-        elif request.path == '/clear_completed_tasks/':
-            completed_items = Task.objects.filter(completed=True)
-            completed_items.delete()
-            return JsonResponse({'result': 'success'})
 
     def get(self, request):
         all_items = list(Task.objects.order_by('id').values())
