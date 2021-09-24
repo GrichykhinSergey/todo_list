@@ -1,54 +1,52 @@
 from django.template.loader import render_to_string
-from django.views.generic import View
-from django.http import HttpResponse, JsonResponse
+from rest_framework.renderers import StaticHTMLRenderer
+from rest_framework.views import APIView
 from .models import Task
+from rest_framework import generics
+from todo.serializers import TaskSerializer
+from rest_framework.response import Response
 import json
 
 
-class MainPageView(View):
+class MainPageView(generics.RetrieveAPIView):
+    renderer_classes = [StaticHTMLRenderer]
+
+    def get(self, request, *args, **kwargs):
+        data = render_to_string('index.html')
+        return Response(data)
+
+
+class AllItemsView(APIView):
+    def patch(self, request):
+        data = request.data
+        task = Task.objects.get(id=data['id'])
+        serializer = TaskSerializer(instance=task, data=data)
+        if serializer.is_valid():
+            serializer.save()
+        if request.path == '/edit_item/':
+            return Response(serializer.data)
+        return Response({'result': 'success'})
+
+    def post(self, request):
+        data = request.data
+        serializer = TaskSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+        return Response(serializer.data)
+
     def get(self, request):
-        rendered = render_to_string('index.html')
-        return HttpResponse(rendered)
+        queryset = Task.objects.all().order_by('id')
+        serializer = TaskSerializer(queryset, many=True)
+        return Response(serializer.data)
 
-
-class AllItemsView(View):
     def delete(self, request):
         data = json.loads(request.body)
 
         if request.path == '/delete_item/':
             item_to_delete = Task.objects.get(id=data['id'])
             item_to_delete.delete()
-            return JsonResponse({'result': 'success'})
+            return Response({'result': 'success'})
         elif request.path == '/clear_completed_tasks/':
             completed_items = Task.objects.filter(completed=True)
             completed_items.delete()
-            return JsonResponse({'result': 'success'})
-
-    def patch(self, request):
-        data = json.loads(request.body)
-
-        if request.path == '/edit_item/':
-            item_to_update = Task.objects.get(id=data['id'])
-            item_to_update.data = data['content']
-            item_to_update.save()
-            updated_item = list(Task.objects.filter(id=data['id']).values())
-            print(updated_item)
-            return JsonResponse(updated_item[-1], safe=False)
-        if request.path == '/completed_item/':
-            item_to_change_state = Task.objects.get(id=data['id'])
-            item_to_change_state.completed = data['completed']
-            item_to_change_state.save()
-            return JsonResponse({'result': 'success'})
-
-    def post(self, request):
-        data = json.loads(request.body)
-
-        if request.path == '/add/':
-            new_item = Task(data=data['content'])
-            new_item.save()
-            item_data = list(Task.objects.order_by('id').filter(data=data['content']).values())
-            return JsonResponse(item_data[-1], safe=False)
-
-    def get(self, request):
-        all_items = list(Task.objects.order_by('id').values())
-        return JsonResponse(all_items, safe=False)
+            return Response({'result': 'success'})
