@@ -60,8 +60,10 @@ const patchRequest = () => {
   if (checkStringLength()) {
     fetch('/edit_item/', {
       method: 'PATCH',
-      headers: {'X-CSRFToken': csrftoken},
-      body: JSON.stringify({'id': liEl.id.slice(2), 'content': input.value})
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/json'},
+      body: JSON.stringify({'id': liEl.id.slice(2), 'data': input.value, 'completed': false})
     })
         .then((response) => response.json())
         .then((result) =>  liEl.lastChild.textContent = result.data)
@@ -98,8 +100,13 @@ const completedTasksHandler = () => {
 
       fetch('/completed_item/', {
         method: 'PATCH',
-        headers: {'X-CSRFToken': csrftoken},
-        body: JSON.stringify({'id': el.parentElement.id.slice(2), 'completed': el.parentElement.classList.contains('checked')})
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'Content-Type': 'application/json'},
+        body: JSON.stringify({
+          'id': el.parentElement.id.slice(2),
+          'data': el.parentElement.lastChild.textContent,
+          'completed': el.parentElement.classList.contains('checked')})
       })
           .then((response) => response.json())
           .then((result) => console.log(result['result']))
@@ -173,8 +180,10 @@ add.onclick = () => {
   if (checkStringLength()) {
     fetch('/add/', {
       method: 'POST',
-      headers: {'X-CSRFToken': csrftoken},
-      body: JSON.stringify({'content': input.value})
+      headers: {
+        'X-CSRFToken': csrftoken,
+        'Content-Type': 'application/json'},
+      body: JSON.stringify({'data': input.value})
     })
       .then((response) => response.json())
       .then((result) => createElement(result))
@@ -189,8 +198,11 @@ document.addEventListener('keydown', (event) => {
       } else {
         fetch('/add/', {
         method: 'POST',
-        headers: {'X-CSRFToken': csrftoken},
-        body: JSON.stringify({'content': input.value})
+        headers: {
+          'X-CSRFToken': csrftoken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({'data': input.value})
         })
           .then((response) => response.json())
           .then((result) => createElement(result))
